@@ -12,11 +12,14 @@ struct ProcNetTcpEntry {
     inode: usize,
 }
 
-fn convert_proc_net_tcp_address(hex_address: &str) -> Result<(String, u16), std::num::ParseIntError> {
+//fn convert_proc_net_tcp_address(hex_address: &str) -> Result<(String, u16), std::num::ParseIntError> {
+pub fn convert_proc_net_tcp_address(hex_address: &str) -> Result<(String, u16), Box<dyn std::error::Error>> {
     let parts: Vec<&str> = hex_address.split(":").collect();
 
     if parts.len() != 2 {
-        return Err(std::num::ParseIntError::new(std::num::IntErrorKind::InvalidDigit, "Invalid address format"));
+        //return Err(std::num::ParseIntError::new(std::num::IntErrorKind::InvalidDigit, "Invalid address format"));
+        //
+        return Err(format!("Invalid proc line {}", 2).into());
     }
 
     let ip_hex = parts[0];
@@ -24,13 +27,13 @@ fn convert_proc_net_tcp_address(hex_address: &str) -> Result<(String, u16), std:
 
     let ip_num = u32::from_str_radix(ip_hex, 16)?;
     let ip_bytes = ip_num.to_be_bytes();
-    let ip_addr = format!("", ip_bytes[0], ip_bytes[1], ip_bytes[2], ip_bytes[3]);
+    let ip_addr = format!("{}.{}.{}.{}", ip_bytes[3], ip_bytes[2], ip_bytes[1], ip_bytes[0]);
 
     let port_num = u16::from_str_radix(port_hex, 16)?;
 
-    Ok((ip_addr, port_num));
+    Ok((ip_addr, port_num))
 }
 
-fn convert_proc_net_entry(proc_entry: &str) -> Result<ProcNetTcpEntry, std::num::ParseIntError> {
-}
+//fn convert_proc_net_entry(proc_entry: &str) -> Result<ProcNetTcpEntry, std::num::ParseIntError> {
+//}
 

@@ -1,6 +1,8 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod network;
+
 use std::fs;
 use std::path::Path;
 
@@ -23,6 +25,14 @@ fn discover_network() {
             let inode = parts[9];
 
             println!("Local: {}, Remote: {}, Inode: {}", local_address, remote_address, inode);
+
+            if let Ok(parsed_addr) = network::convert_proc_net_tcp_address(&local_address) {
+                println!("Parsed IP: {}, Parsed Port: {}", parsed_addr.0, parsed_addr.1);
+            }
+
+            if let Ok(parsed_remote) = network::convert_proc_net_tcp_address(&remote_address) {
+                println!("Remote IP: {}, Remote Port: {}", parsed_remote.0, parsed_remote.1);
+            }
             // You can use the inode to find more information about the connection, e.g., in /proc/<pid>/fd/
         }
     }
