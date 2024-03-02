@@ -6,8 +6,21 @@ mod network;
 use std::fs;
 use std::path::Path;
 
+#[derive(serde::Serialize)]
+struct NetworkConnection {
+    local_ip: String,
+    local_port: u8,
+    remote_ip: String,
+    remote_port: u8
+}
+
+#[derive(serde::Serialize)]
+struct NetworkState {
+    connections: Vec<NetworkConnection>
+}
+
 #[tauri::command]
-fn discover_network() {
+fn discover_network() -> NetworkState {
     let tcp_file = Path::new("/proc/net/tcp");
     let data = match fs::read_to_string(tcp_file) {
         Ok(data) => data,
@@ -16,6 +29,8 @@ fn discover_network() {
             return;
         }
     };
+
+    let conns = Vec<NetworkConnection>::default();
 
     for line in data.lines().skip(1) {
         let parts: Vec<&str> = line.split_whitespace().collect();
@@ -35,6 +50,9 @@ fn discover_network() {
             }
             // You can use the inode to find more information about the connection, e.g., in /proc/<pid>/fd/
         }
+    }
+
+    NetworkState {
     }
 }
 
